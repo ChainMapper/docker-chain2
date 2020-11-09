@@ -22,15 +22,21 @@ def checkoutOrCreateBranch(branch) {
 withPod {
 	node(POD_LABEL) {
 		def tag = "${env.BRANCH_NAME.replaceAll('/', '-')}-${env.BUILD_NUMBER}"
-		def registry = "packages.netwatwezoeken.nl/chainmapper"
-		def appname = "chain2"
-		def service = "${registry}/${appname}:${tag}"
-		checkout scm		
-        container('kaniko') {
-            stage('Build image') {
-                sh("cp /cred/.dockerconfigjson /kaniko/.docker/config.json")
-                sh("executor --context=`pwd` --dockerfile=`pwd`/Dockerfile --destination=${service} --single-snapshot")
-			}	
-		}		
+		if (env.BRANCH_NAME == 'master' && env.TAG_NAME ) {
+            tag = env.TAG_NAME
+        } else if (env.BRANCH_NAME == 'master') {
+            tag = "latest"
+        }
+		echo "${tag}"
+		//def registry = "packages.netwatwezoeken.nl/chainmapper"
+		//def appname = "chain2"
+		//def service = "${registry}/${appname}:${tag}"
+		//checkout scm		
+        //container('kaniko') {
+        //    stage('Build image') {
+        //        sh("cp /cred/.dockerconfigjson /kaniko/.docker/config.json")
+        //        sh("executor --context=`pwd` --dockerfile=`pwd`/Dockerfile --destination=${service} --single-snapshot")
+		//	}	
+		//}		
 	}
 }
